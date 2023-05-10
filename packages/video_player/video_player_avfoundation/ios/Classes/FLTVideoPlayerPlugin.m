@@ -599,8 +599,10 @@ NS_INLINE UIViewController *rootViewController(void) {
 }
 
 - (void)initialize:(FlutterError *__autoreleasing *)error {
+  // WE HAVE A CUSTOM AUDIO SESSION CONFIGURATION, SO IT SHOULDN'T BE CONFIGURED HERE.
+
   // Allow audio playback when the Ring/Silent switch is set to silent
-  [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+  // [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 
   [self.playersByTextureId
       enumerateKeysAndObjectsUsingBlock:^(NSNumber *textureId, FLTVideoPlayer *player, BOOL *stop) {
@@ -704,13 +706,15 @@ NS_INLINE UIViewController *rootViewController(void) {
 
 - (void)setMixWithOthers:(FLTMixWithOthersMessage *)input
                    error:(FlutterError *_Nullable __autoreleasing *)error {
-  if (input.mixWithOthers.boolValue) {
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
-                                     withOptions:AVAudioSessionCategoryOptionMixWithOthers
-                                           error:nil];
-  } else {
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-  }
+  // WE HAVE A CUSTOM AUDIO SESSION CONFIGURATION, SO IT SHOULDN'T BE CONFIGURED HERE.
+
+  // if (input.mixWithOthers.boolValue) {
+  //   [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback
+  //                                    withOptions:AVAudioSessionCategoryOptionMixWithOthers
+  //                                          error:nil];
+  // } else {
+  //   [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+  // }
 }
 
 @end
