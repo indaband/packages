@@ -1,3 +1,33 @@
+## 4.1.6
+
+* Fixes unawaited_futures violations.
+* Updates minimum supported SDK version to Flutter 3.3/Dart 2.18.
+* Aligns Dart and Flutter SDK constraints.
+
+## 4.1.5
+
+* Removes use of `runtimeType.toString()`.
+
+## 4.1.4
+
+* Ignores lint warnings from new changes in Flutter master.
+* Suppresses more deprecation warnings for changes to Flutter master.
+* Removes duplicate test from test script.
+* Fixes lint warnings.
+
+## 4.1.3
+
+* Suppresses deprecation warnings.
+
+## 4.1.2
+
+* Migrates from `ui.hash*` to `Object.hash*`.
+
+## 4.1.1
+
+* Updates package description.
+* Updates for non-nullable bindings.
+
 ## 4.1.0
 
 - Added custom header support.

@@ -1,3 +1,89 @@
+## 0.6.15+1
+
+* Fixes 'The Scrollbar's ScrollController has no ScrollPosition attached' exception when scrolling scrollable code blocks.
+* Fixes stale ignore: prefer_const_constructors.
+* Updates minimum supported SDK version to Flutter 3.10/Dart 3.0.
+
+## 0.6.15
+
+* Fixes unawaited_futures violations.
+* Updates minimum Flutter version to 3.3.
+* Aligns Dart and Flutter SDK constraints.
+* Replace `describeEnum` with the `name` getter.
+* Supports custom rendering of tags without children.
+
+## 0.6.14
+
+* Require `markdown: ^7.0.0`
+
+## 0.6.13+1
+
+* Adjusts code to account for nullability change in Flutter SDK.
+* Updates the example to specify the import for `DropdownMenu`.
+
+## 0.6.13
+
+* Support changes in the latest `package:markdown`.
+
+## 0.6.12
+
+* Markdown Lists now take into account `fitContent` instead of always expanding to the maximum horizontally ([flutter/flutter#108976](https://github.com/flutter/flutter/issues/108976)).
+
+## 0.6.11
+
+* Deprecates and removes use of `TaskListSyntax` as new markdown package supports checkboxes natively.
+  Consider using `OrderedListWithCheckBoxSyntax` or `UnorderedListWithCheckBoxSyntax` as a replacement.
+* Changes `_buildCheckbox()` to inspect state of checkbox input element by existence of `'checked'` attribute.
+
+## 0.6.10+6
+
+* Removes print logged when not handling hr for alignment.
+* Removes print logged when not handling li for alignment.
+
+## 0.6.10+5
+
+* Fixes lint warnings.
+
+## 0.6.10+4
+
+* Updates text theme parameters to avoid deprecation issues.
+
+## 0.6.10+3
+
+* Fixes shrinkWrap not taken into account with single child ([flutter/flutter#105299](https://github.com/flutter/flutter/issues/105299)).
+
+## 0.6.10+2
+
+* Migrates from `ui.hash*` to `Object.hash*`.
+
+## 0.6.10+1
+
+* Updates Linux example to remove unneeded library dependencies that
+  could cause build failures.
+* Updates for non-nullable bindings.
+
+## 0.6.10
+
+ * Update `markdown` dependency
+
+## 0.6.9+1
+
+ * Remove build status badge from `README.md`
+
+## 0.6.9
+
+  * Leading spaces in a paragraph and in list items are now ignored according to [GFM #192](https://github.github.com/gfm/#example-192) and [GFM #236](https://github.github.com/gfm/#example-236).
+
+## 0.6.8
+
+  * Added option paddingBuilders
+
+## 0.6.7
+
+ * Fix `unnecessary_import` lint errors.
+ * Added option pPadding
+ * Added options h1Padding - h6Padding
+
 ## 0.6.6
 
  * Soft line break

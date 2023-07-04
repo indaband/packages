@@ -3,8 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui' as ui show Image, Codec, FrameInfo, instantiateImageCodec;
+import 'dart:ui' as ui show Codec, FrameInfo, Image, instantiateImageCodec;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +28,9 @@ class FakeImageProvider extends ImageProvider<FakeImageProvider> {
   }
 
   @override
+  // TODO(cyanglaz): migrate to use the new APIs
+  // https://github.com/flutter/flutter/issues/105336
+  // ignore: deprecated_member_use
   ImageStreamCompleter load(FakeImageProvider key, DecoderCallback decode) {
     assert(key == this);
     return OneFrameImageStreamCompleter(
@@ -69,7 +71,7 @@ Future<void> main() async {
     // We need to have a testWidgets test in order to initialize the image
     // cache for the other tests, but they timeout if they too are testWidgets
     // tests.
-    tester.pumpWidget(const Placeholder());
+    await tester.pumpWidget(const Placeholder());
   });
 
   test(
@@ -401,6 +403,24 @@ Future<void> main() async {
     expect(palette.paletteColors.length, equals(1));
     expect(palette.paletteColors[0].color,
         within<Color>(distance: 8, from: const Color(0xff0000ff)));
+  });
+
+  test('PaletteColor == does not crash on invalid comparisons', () {
+    final PaletteColor paletteColorA = PaletteColor(const Color(0xFFFFFFFF), 1);
+    final PaletteColor paletteColorB = PaletteColor(const Color(0xFFFFFFFF), 1);
+    final Object object = Object();
+
+    expect(paletteColorA == paletteColorB, true);
+    expect(paletteColorA == object, false);
+  });
+
+  test('PaletteTarget == does not crash on invalid comparisons', () {
+    final PaletteTarget paletteTargetA = PaletteTarget();
+    final PaletteTarget paletteTargetB = PaletteTarget();
+    final Object object = Object();
+
+    expect(paletteTargetA == paletteTargetB, true);
+    expect(paletteTargetA == object, false);
   });
 }
 

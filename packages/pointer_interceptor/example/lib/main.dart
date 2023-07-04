@@ -53,7 +53,7 @@ void main() {
 /// Main app
 class MyApp extends StatelessWidget {
   /// Creates main app.
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -67,10 +67,10 @@ class MyApp extends StatelessWidget {
 /// First page
 class MyHomePage extends StatefulWidget {
   /// Creates first page.
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({super.key});
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -116,6 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 alignment: Alignment.center,
                 children: <Widget>[
                   HtmlElement(
+                    key: const ValueKey<String>('background-widget'),
                     onClick: () {
                       _clickedOn('html-element');
                     },
@@ -129,6 +130,17 @@ class _MyHomePageState extends State<MyHomePage> {
                         onPressed: () {
                           _clickedOn('transparent-button');
                         },
+                      ),
+                      PointerInterceptor(
+                        intercepting: false,
+                        child: ElevatedButton(
+                          key: const Key('wrapped-transparent-button'),
+                          child:
+                              const Text('Never calls onPressed transparent'),
+                          onPressed: () {
+                            _clickedOn('wrapped-transparent-button');
+                          },
+                        ),
                       ),
                       PointerInterceptor(
                         child: ElevatedButton(
@@ -190,10 +202,10 @@ class _MyHomePageState extends State<MyHomePage> {
 /// Initialize the videoPlayer, then render the corresponding view...
 class HtmlElement extends StatelessWidget {
   /// Constructor
-  const HtmlElement({Key? key, required this.onClick}) : super(key: key);
+  const HtmlElement({super.key, required this.onClick});
 
   /// A function to run when the element is clicked
-  final Function onClick;
+  final VoidCallback onClick;
 
   @override
   Widget build(BuildContext context) {

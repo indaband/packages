@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import 'package:palette_generator/palette_generator.dart';
 
@@ -20,7 +19,7 @@ const Color _kPlaceholderColor = Color(0x80404040);
 /// The main Application class.
 class MyApp extends StatelessWidget {
   /// Creates the main Application class.
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -44,11 +43,11 @@ class MyApp extends StatelessWidget {
 class ImageColors extends StatefulWidget {
   /// Creates the home page.
   const ImageColors({
-    Key? key,
+    super.key,
     this.title,
     required this.image,
     this.imageSize,
-  }) : super(key: key);
+  });
 
   /// The title that is shown at the top of the page.
   final String? title;
@@ -60,7 +59,7 @@ class ImageColors extends StatefulWidget {
   final Size? imageSize;
 
   @override
-  _ImageColorsState createState() {
+  State<ImageColors> createState() {
     return _ImageColorsState();
   }
 }
@@ -150,9 +149,6 @@ class _ImageColorsState extends State<ImageColors> {
         title: Text(widget.title ?? ''),
       ),
       body: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(20.0),
@@ -176,9 +172,7 @@ class _ImageColorsState extends State<ImageColors> {
                       decoration: BoxDecoration(
                           color: _kSelectionRectangleBackground,
                           border: Border.all(
-                            width: 1.0,
                             color: _kSelectionRectangleBorder,
-                            style: BorderStyle.solid,
                           )),
                     )),
               ]),
@@ -200,7 +194,7 @@ class PaletteSwatches extends StatelessWidget {
   ///
   /// The [generator] is optional. If it is null, then the display will
   /// just be an empty container.
-  const PaletteSwatches({Key? key, this.generator}) : super(key: key);
+  const PaletteSwatches({super.key, this.generator});
 
   /// The [PaletteGenerator] that contains all of the swatches that we're going
   /// to display.
@@ -219,7 +213,6 @@ class PaletteSwatches extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Wrap(
           children: swatches,
@@ -251,10 +244,10 @@ class PaletteSwatch extends StatelessWidget {
   /// then the swatch will show a placeholder instead, to indicate
   /// that there is no color.
   const PaletteSwatch({
-    Key? key,
+    super.key,
     this.color,
     this.label,
-  }) : super(key: key);
+  });
 
   /// The color of the swatch.
   final Color? color;
@@ -281,13 +274,11 @@ class PaletteSwatch extends StatelessWidget {
               fallbackWidth: 34.0,
               fallbackHeight: 20.0,
               color: Color(0xff404040),
-              strokeWidth: 2.0,
             )
           : Container(
               decoration: BoxDecoration(
                   color: color,
                   border: Border.all(
-                    width: 1.0,
                     color: _kPlaceholderColor,
                     style: colorDistance < 0.2
                         ? BorderStyle.solid
@@ -302,7 +293,6 @@ class PaletteSwatch extends StatelessWidget {
       swatch = ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 130.0, minWidth: 130.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             swatch,
             Container(width: 5.0),

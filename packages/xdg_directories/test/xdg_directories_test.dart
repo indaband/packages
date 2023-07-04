@@ -15,12 +15,21 @@ void main() {
   final Map<String, String> fakeEnv = <String, String>{};
   late Directory tmpDir;
 
-  String testPath(String subdir) => path.join(tmpDir.path, subdir);
+  String testRootPath() {
+    final String basePath = tmpDir.path;
+    return Platform.isWindows
+        // Strip the drive specifier when running tests on Windows since
+        // environment variables use : as a path list separator.
+        ? basePath.substring(basePath.indexOf(':') + 1)
+        : basePath;
+  }
+
+  String testPath(String subdir) => path.join(testRootPath(), subdir);
 
   setUp(() {
     tmpDir = Directory.systemTemp.createTempSync('xdg_test');
     fakeEnv.clear();
-    fakeEnv['HOME'] = tmpDir.path;
+    fakeEnv['HOME'] = testRootPath();
     fakeEnv['XDG_CACHE_HOME'] = testPath('.test_cache');
     fakeEnv['XDG_CONFIG_DIRS'] = testPath('etc/test_xdg');
     fakeEnv['XDG_CONFIG_HOME'] = testPath('.test_config');
@@ -59,7 +68,7 @@ XDG_VIDEOS_DIR="$HOME/Videos"
 
   test('Default fallback values work', () {
     fakeEnv.clear();
-    fakeEnv['HOME'] = tmpDir.path;
+    fakeEnv['HOME'] = testRootPath();
     expect(xdg.cacheHome.path, equals(testPath('.cache')));
     expect(xdg.configHome.path, equals(testPath('.config')));
     expect(xdg.dataHome.path, equals(testPath('.local/share')));
@@ -104,6 +113,16 @@ XDG_VIDEOS_DIR="$HOME/Videos"
     xdg.xdgProcessManager = const LocalProcessManager();
   });
 
+  test('Returns null when xdg-user-dir executable is not present', () {
+    xdg.xdgProcessManager = FakeProcessManager(
+      <String, String>{},
+      canRunExecutable: false,
+    );
+    expect(xdg.getUserDirectory('DESKTOP'), isNull,
+        reason: 'Found xdg user directory without access to xdg-user-dir');
+    xdg.xdgProcessManager = const LocalProcessManager();
+  });
+
   test('Throws StateError when HOME not set', () {
     fakeEnv.clear();
     expect(() {
@@ -113,9 +132,10 @@ XDG_VIDEOS_DIR="$HOME/Videos"
 }
 
 class FakeProcessManager extends Fake implements ProcessManager {
-  FakeProcessManager(this.expected);
+  FakeProcessManager(this.expected, {this.canRunExecutable = true});
 
   Map<String, String> expected;
+  final bool canRunExecutable;
 
   @override
   ProcessResult runSync(
@@ -127,6 +147,11 @@ class FakeProcessManager extends Fake implements ProcessManager {
     Encoding stdoutEncoding = systemEncoding,
     Encoding stderrEncoding = systemEncoding,
   }) {
-    return ProcessResult(0, 0, expected[command[1]]!, '');
+    return ProcessResult(0, 0, expected[command[1]], '');
+  }
+
+  @override
+  bool canRun(dynamic executable, {String? workingDirectory}) {
+    return canRunExecutable;
   }
 }

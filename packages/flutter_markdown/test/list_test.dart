@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import 'utils.dart';
 
 void main() => defineTests();
@@ -54,6 +54,24 @@ void defineTests() {
         ]);
       },
     );
+
+    testWidgets(
+        // Example 236 from the GitHub Flavored Markdown specification.
+        'leading space are ignored', (WidgetTester tester) async {
+      const String data = ' -    one\n\n        two';
+      await tester.pumpWidget(
+        boilerplate(
+          const MarkdownBody(data: data),
+        ),
+      );
+
+      final Iterable<Widget> widgets = tester.allWidgets;
+      expectTextStrings(widgets, <String>[
+        '•',
+        'one',
+        'two',
+      ]);
+    });
   });
 
   group('Ordered List', () {
@@ -76,13 +94,25 @@ void defineTests() {
           'Item 2',
           '3.',
           'Item 3',
-          '10.',
+          '4.',
           'Item 10',
-          '11.',
+          '5.',
           'Item 11'
         ]);
       },
     );
+
+    testWidgets('leading space are ignored', (WidgetTester tester) async {
+      const String data = ' 1.    one\n\n       two';
+      await tester.pumpWidget(
+        boilerplate(
+          const MarkdownBody(data: data),
+        ),
+      );
+
+      final Iterable<Widget> widgets = tester.allWidgets;
+      expectTextStrings(widgets, <String>['1.', 'one', 'two']);
+    });
   });
 
   group('Task List', () {
@@ -152,6 +182,54 @@ void defineTests() {
           'false',
           'Item 2',
         ]);
+      },
+    );
+  });
+
+  group('fitContent', () {
+    testWidgets(
+      'uses maximum width when false',
+      (WidgetTester tester) async {
+        const String data = '- Foo\n- Bar';
+
+        await tester.pumpWidget(
+          boilerplate(
+            const Column(
+              children: <Widget>[
+                MarkdownBody(fitContent: false, data: data),
+              ],
+            ),
+          ),
+        );
+
+        final double screenWidth = tester.allElements.first.size!.width;
+        final double markdownBodyWidth =
+            find.byType(MarkdownBody).evaluate().single.size!.width;
+
+        expect(markdownBodyWidth, equals(screenWidth));
+      },
+    );
+
+    testWidgets(
+      'uses minimum width when true',
+      (WidgetTester tester) async {
+        const String data = '- Foo\n- Bar';
+
+        await tester.pumpWidget(
+          boilerplate(
+            const Column(
+              children: <Widget>[
+                MarkdownBody(data: data),
+              ],
+            ),
+          ),
+        );
+
+        final double screenWidth = tester.allElements.first.size!.width;
+        final double markdownBodyWidth =
+            find.byType(MarkdownBody).evaluate().single.size!.width;
+
+        expect(markdownBodyWidth, lessThan(screenWidth));
       },
     );
   });

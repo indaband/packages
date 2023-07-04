@@ -4,19 +4,26 @@
 
 import 'dart:convert';
 import 'dart:io' as io;
-import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-final TextTheme textTheme =
-    Typography.material2018(platform: TargetPlatform.android)
-        .black
-        .merge(const TextTheme(bodyText2: TextStyle(fontSize: 12.0)));
+final TextTheme textTheme = Typography.material2018()
+    .black
+    .merge(const TextTheme(bodyMedium: TextStyle(fontSize: 12.0)));
+
+Iterable<Widget> selfAndDescendantWidgetsOf(Finder start, WidgetTester tester) {
+  final Element startElement = tester.element(start);
+  final Iterable<Widget> descendants =
+      collectAllElementsFrom(startElement, skipOffstage: false)
+          .map((Element e) => e.widget);
+  return <Widget>[
+    startElement.widget,
+    ...descendants,
+  ];
+}
 
 void expectWidgetTypes(Iterable<Widget> widgets, List<Type> expected) {
   final List<Type> actual = widgets.map((Widget w) => w.runtimeType).toList();
@@ -146,7 +153,7 @@ void expectTableSize(int rows, int columns) {
 
   expect(table.children.length, rows);
   for (int index = 0; index < rows; index++) {
-    expect(table.children[index].children!.length, columns);
+    expect(_ambiguate(table.children[index].children)!.length, columns);
   }
 }
 
@@ -157,9 +164,12 @@ void expectLinkTap(MarkdownLink? actual, MarkdownLink expected) {
 }
 
 String dumpRenderView() {
-  return WidgetsBinding.instance!.renderViewElement!.toStringDeep().replaceAll(
-      RegExp(r'SliverChildListDelegate#\d+', multiLine: true),
-      'SliverChildListDelegate');
+  // TODO(goderbauer): Migrate to rootElement once v3.9.0 is the oldest supported Flutter version.
+  // ignore: deprecated_member_use
+  return WidgetsBinding.instance.renderViewElement!.toStringDeep().replaceAll(
+        RegExp(r'SliverChildListDelegate#\d+', multiLine: true),
+        'SliverChildListDelegate',
+      );
 }
 
 /// Wraps a widget with a left-to-right [Directionality] for tests.
@@ -171,32 +181,42 @@ Widget boilerplate(Widget child) {
 }
 
 class TestAssetBundle extends CachingAssetBundle {
-  static const String manifest = r'{"assets/logo.png":["assets/logo.png"]}';
-
   @override
   Future<ByteData> load(String key) async {
     if (key == 'AssetManifest.json') {
+      const String manifest = r'{"assets/logo.png":["assets/logo.png"]}';
       final ByteData asset =
           ByteData.view(utf8.encoder.convert(manifest).buffer);
       return Future<ByteData>.value(asset);
+    } else if (key == 'AssetManifest.bin') {
+      final ByteData manifest = const StandardMessageCodec().encodeMessage(
+          <String, List<Object>>{'assets/logo.png': <Object>[]})!;
+      return Future<ByteData>.value(manifest);
+    } else if (key == 'AssetManifest.smcbin') {
+      final ByteData manifest = const StandardMessageCodec().encodeMessage(
+          <String, List<Object>>{'assets/logo.png': <Object>[]})!;
+      return Future<ByteData>.value(manifest);
     } else if (key == 'assets/logo.png') {
       // The root directory tests are run from is different for 'flutter test'
       // verses 'flutter test test/*_test.dart'. Adjust the root directory
       // to access the assets directory.
       final io.Directory rootDirectory =
-          io.Directory.current.path.endsWith(io.Platform.pathSeparator + 'test')
+          io.Directory.current.path.endsWith('${io.Platform.pathSeparator}test')
               ? io.Directory.current.parent
               : io.Directory.current;
       final io.File file =
           io.File('${rootDirectory.path}/test/assets/images/logo.png');
 
       final ByteData asset = ByteData.view(file.readAsBytesSync().buffer);
-      if (asset == null) {
-        throw FlutterError('Unable to load asset: $key');
-      }
       return asset;
     } else {
-      throw 'Unknown asset key: $key';
+      throw ArgumentError('Unknown asset key: $key');
     }
   }
 }
+
+/// This allows a value of type T or T? to be treated as a value of type T?.
+///
+/// We use this so that APIs that have become non-nullable can still be used
+/// with `!` and `?` on the stable branch.
+T? _ambiguate<T>(T? value) => value;

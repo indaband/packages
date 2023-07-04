@@ -13,10 +13,10 @@ void main() {
   test('GoogleBenchmarkParser parses example json.', () async {
     final List<MetricPoint> points =
         await GoogleBenchmarkParser.parse('test/example_google_benchmark.json');
-    expect(points.length, 6);
+    expect(points.length, 9);
     expectSetMatch(
       points.map((MetricPoint p) => p.value),
-      <int>[101, 101, 4460, 4460, 6548, 6548],
+      <double>[101, 101, 4460, 4460, 6548, 6548, 3.8, 3.89, 4.89],
     );
     expectSetMatch(
       points.map((MetricPoint p) => p.tags[kSubResultKey]),
@@ -25,15 +25,24 @@ void main() {
         'real_time',
         'cpu_coefficient',
         'real_coefficient',
+        'rms',
       ],
     );
     expectSetMatch(
       points.map((MetricPoint p) => p.tags[kNameKey]),
       <String>[
         'BM_PaintRecordInit',
-        'BM_ParagraphShortLayout',
-        'BM_ParagraphStylesBigO_BigO',
+        'SkParagraphFixture/ShortLayout',
+        'SkParagraphFixture/TextBigO_BigO',
+        'ParagraphFixture/TextBigO_BigO',
+        'ParagraphFixture/TextBigO_RMS',
       ],
     );
+    for (final MetricPoint p in points) {
+      expect(p.tags.containsKey('host_name'), false);
+      expect(p.tags.containsKey('load_avg'), false);
+      expect(p.tags.containsKey('caches'), false);
+      expect(p.tags.containsKey('executable'), true);
+    }
   });
 }

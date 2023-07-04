@@ -4,17 +4,13 @@
 
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
-import 'package:meta/meta.dart';
 
+import '../flutter_markdown.dart';
 import '_functions_io.dart' if (dart.library.html) '_functions_web.dart';
-import 'builder.dart';
-import 'style_sheet.dart';
 
 /// Signature for callbacks used by [MarkdownWidget] when the user taps a link.
 /// The callback will return the link text, destination, and title from the
@@ -151,7 +147,7 @@ abstract class MarkdownWidget extends StatefulWidget {
   ///
   /// The [data] argument must not be null.
   const MarkdownWidget({
-    Key? key,
+    super.key,
     required this.data,
     this.selectable = false,
     this.styleSheet,
@@ -167,11 +163,12 @@ abstract class MarkdownWidget extends StatefulWidget {
     this.checkboxBuilder,
     this.bulletBuilder,
     this.builders = const <String, MarkdownElementBuilder>{},
+    this.paddingBuilders = const <String, MarkdownPaddingBuilder>{},
     this.fitContent = false,
     this.listItemCrossAxisAlignment =
         MarkdownListItemCrossAxisAlignment.baseline,
     this.softLineBreak = false,
-  }) : super(key: key);
+  });
 
   /// The Markdown to display.
   final String data;
@@ -238,6 +235,19 @@ abstract class MarkdownWidget extends StatefulWidget {
   /// The `SubscriptBuilder` is a subclass of [MarkdownElementBuilder].
   final Map<String, MarkdownElementBuilder> builders;
 
+  /// Add padding for different tags (use only for block elements and img)
+  ///
+  /// For example, we will add padding for `img` tag:
+  ///
+  /// ```dart
+  /// paddingBuilders: {
+  ///   'img': ImgPaddingBuilder(),
+  /// }
+  /// ```
+  ///
+  /// The `ImgPaddingBuilder` is a subclass of [MarkdownPaddingBuilder].
+  final Map<String, MarkdownPaddingBuilder> paddingBuilders;
+
   /// Whether to allow the widget to fit the child content.
   final bool fitContent;
 
@@ -261,7 +271,7 @@ abstract class MarkdownWidget extends StatefulWidget {
   Widget build(BuildContext context, List<Widget>? children);
 
   @override
-  _MarkdownWidgetState createState() => _MarkdownWidgetState();
+  State<MarkdownWidget> createState() => _MarkdownWidgetState();
 }
 
 class _MarkdownWidgetState extends State<MarkdownWidget>
@@ -300,8 +310,7 @@ class _MarkdownWidgetState extends State<MarkdownWidget>
 
     final md.Document document = md.Document(
       blockSyntaxes: widget.blockSyntaxes,
-      inlineSyntaxes: (widget.inlineSyntaxes ?? <md.InlineSyntax>[])
-        ..add(TaskListSyntax()),
+      inlineSyntaxes: widget.inlineSyntaxes,
       extensionSet: widget.extensionSet ?? md.ExtensionSet.gitHubFlavored,
       encodeHtml: false,
     );
@@ -321,6 +330,7 @@ class _MarkdownWidgetState extends State<MarkdownWidget>
       checkboxBuilder: widget.checkboxBuilder,
       bulletBuilder: widget.bulletBuilder,
       builders: widget.builders,
+      paddingBuilders: widget.paddingBuilders,
       fitContent: widget.fitContent,
       listItemCrossAxisAlignment: widget.listItemCrossAxisAlignment,
       onTapText: widget.onTapText,
@@ -337,8 +347,9 @@ class _MarkdownWidgetState extends State<MarkdownWidget>
     final List<GestureRecognizer> localRecognizers =
         List<GestureRecognizer>.from(_recognizers);
     _recognizers.clear();
-    for (final GestureRecognizer recognizer in localRecognizers)
+    for (final GestureRecognizer recognizer in localRecognizers) {
       recognizer.dispose();
+    }
   }
 
   @override
@@ -378,56 +389,40 @@ class _MarkdownWidgetState extends State<MarkdownWidget>
 class MarkdownBody extends MarkdownWidget {
   /// Creates a non-scrolling widget that parses and displays Markdown.
   const MarkdownBody({
-    Key? key,
-    required String data,
-    bool selectable = false,
-    MarkdownStyleSheet? styleSheet,
-    MarkdownStyleSheetBaseTheme? styleSheetTheme,
-    SyntaxHighlighter? syntaxHighlighter,
-    MarkdownTapLinkCallback? onTapLink,
-    VoidCallback? onTapText,
-    String? imageDirectory,
-    List<md.BlockSyntax>? blockSyntaxes,
-    List<md.InlineSyntax>? inlineSyntaxes,
-    md.ExtensionSet? extensionSet,
-    MarkdownImageBuilder? imageBuilder,
-    MarkdownCheckboxBuilder? checkboxBuilder,
-    MarkdownBulletBuilder? bulletBuilder,
-    Map<String, MarkdownElementBuilder> builders =
-        const <String, MarkdownElementBuilder>{},
-    MarkdownListItemCrossAxisAlignment listItemCrossAxisAlignment =
-        MarkdownListItemCrossAxisAlignment.baseline,
+    super.key,
+    required super.data,
+    super.selectable,
+    super.styleSheet,
+    // TODO(stuartmorgan): Remove this once 3.0 is no longer part of the
+    // legacy analysis matrix; it's a false positive there.
+    // ignore: avoid_init_to_null
+    super.styleSheetTheme = null,
+    super.syntaxHighlighter,
+    super.onTapLink,
+    super.onTapText,
+    super.imageDirectory,
+    super.blockSyntaxes,
+    super.inlineSyntaxes,
+    super.extensionSet,
+    super.imageBuilder,
+    super.checkboxBuilder,
+    super.bulletBuilder,
+    super.builders,
+    super.paddingBuilders,
+    super.listItemCrossAxisAlignment,
     this.shrinkWrap = true,
-    bool fitContent = true,
-    bool softLineBreak = false,
-  }) : super(
-          key: key,
-          data: data,
-          selectable: selectable,
-          styleSheet: styleSheet,
-          styleSheetTheme: styleSheetTheme,
-          syntaxHighlighter: syntaxHighlighter,
-          onTapLink: onTapLink,
-          onTapText: onTapText,
-          imageDirectory: imageDirectory,
-          blockSyntaxes: blockSyntaxes,
-          inlineSyntaxes: inlineSyntaxes,
-          extensionSet: extensionSet,
-          imageBuilder: imageBuilder,
-          checkboxBuilder: checkboxBuilder,
-          builders: builders,
-          listItemCrossAxisAlignment: listItemCrossAxisAlignment,
-          bulletBuilder: bulletBuilder,
-          fitContent: fitContent,
-          softLineBreak: softLineBreak,
-        );
+    super.fitContent = true,
+    super.softLineBreak,
+  });
 
-  /// See [ScrollView.shrinkWrap]
+  /// If [shrinkWrap] is `true`, [MarkdownBody] will take the minimum height
+  /// that wraps its content. Otherwise, [MarkdownBody] will expand to the
+  /// maximum allowed height.
   final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context, List<Widget>? children) {
-    if (children!.length == 1) {
+    if (children!.length == 1 && shrinkWrap) {
       return children.single;
     }
     return Column(
@@ -451,50 +446,33 @@ class MarkdownBody extends MarkdownWidget {
 class Markdown extends MarkdownWidget {
   /// Creates a scrolling widget that parses and displays Markdown.
   const Markdown({
-    Key? key,
-    required String data,
-    bool selectable = false,
-    MarkdownStyleSheet? styleSheet,
-    MarkdownStyleSheetBaseTheme? styleSheetTheme,
-    SyntaxHighlighter? syntaxHighlighter,
-    MarkdownTapLinkCallback? onTapLink,
-    VoidCallback? onTapText,
-    String? imageDirectory,
-    List<md.BlockSyntax>? blockSyntaxes,
-    List<md.InlineSyntax>? inlineSyntaxes,
-    md.ExtensionSet? extensionSet,
-    MarkdownImageBuilder? imageBuilder,
-    MarkdownCheckboxBuilder? checkboxBuilder,
-    MarkdownBulletBuilder? bulletBuilder,
-    Map<String, MarkdownElementBuilder> builders =
-        const <String, MarkdownElementBuilder>{},
-    MarkdownListItemCrossAxisAlignment listItemCrossAxisAlignment =
-        MarkdownListItemCrossAxisAlignment.baseline,
+    super.key,
+    required super.data,
+    super.selectable,
+    super.styleSheet,
+    // TODO(stuartmorgan): Remove this once 3.0 is no longer part of the
+    // legacy analysis matrix; it's a false positive there.
+    // ignore: avoid_init_to_null
+    super.styleSheetTheme = null,
+    super.syntaxHighlighter,
+    super.onTapLink,
+    super.onTapText,
+    super.imageDirectory,
+    super.blockSyntaxes,
+    super.inlineSyntaxes,
+    super.extensionSet,
+    super.imageBuilder,
+    super.checkboxBuilder,
+    super.bulletBuilder,
+    super.builders,
+    super.paddingBuilders,
+    super.listItemCrossAxisAlignment,
     this.padding = const EdgeInsets.all(16.0),
     this.controller,
     this.physics,
     this.shrinkWrap = false,
-    bool softLineBreak = false,
-  }) : super(
-          key: key,
-          data: data,
-          selectable: selectable,
-          styleSheet: styleSheet,
-          styleSheetTheme: styleSheetTheme,
-          syntaxHighlighter: syntaxHighlighter,
-          onTapLink: onTapLink,
-          onTapText: onTapText,
-          imageDirectory: imageDirectory,
-          blockSyntaxes: blockSyntaxes,
-          inlineSyntaxes: inlineSyntaxes,
-          extensionSet: extensionSet,
-          imageBuilder: imageBuilder,
-          checkboxBuilder: checkboxBuilder,
-          builders: builders,
-          listItemCrossAxisAlignment: listItemCrossAxisAlignment,
-          bulletBuilder: bulletBuilder,
-          softLineBreak: softLineBreak,
-        );
+    super.softLineBreak,
+  });
 
   /// The amount of space by which to inset the children.
   final EdgeInsets padding;
@@ -528,11 +506,16 @@ class Markdown extends MarkdownWidget {
 }
 
 /// Parse [task list items](https://github.github.com/gfm/#task-list-items-extension-).
+///
+/// This class is no longer used as Markdown now supports checkbox syntax natively.
+@Deprecated(
+    'Use [OrderedListWithCheckBoxSyntax] or [UnorderedListWithCheckBoxSyntax]')
 class TaskListSyntax extends md.InlineSyntax {
-  /// Cretaes a new instance.
+  /// Creates a new instance.
+  @Deprecated(
+      'Use [OrderedListWithCheckBoxSyntax] or [UnorderedListWithCheckBoxSyntax]')
   TaskListSyntax() : super(_pattern);
 
-  // FIXME: Waiting for dart-lang/markdown#269 to land
   static const String _pattern = r'^ *\[([ xX])\] +';
 
   @override
@@ -544,4 +527,14 @@ class TaskListSyntax extends md.InlineSyntax {
     parser.addNode(el);
     return true;
   }
+}
+
+/// An interface for an padding builder for element.
+abstract class MarkdownPaddingBuilder {
+  /// Called when an Element has been reached, before its children have been
+  /// visited.
+  void visitElementBefore(md.Element element) {}
+
+  /// Called when a widget node has been rendering and need tag padding.
+  EdgeInsets getPadding() => EdgeInsets.zero;
 }

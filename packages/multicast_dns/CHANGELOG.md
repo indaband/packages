@@ -1,3 +1,25 @@
+## NEXT
+
+* Updates minimum supported SDK version to Flutter 3.3/Dart 2.18.
+
+## 0.3.2+3
+
+* Removes use of `runtimeType.toString()`.
+* Updates minimum SDK version to Flutter 3.0.
+
+## 0.3.2+2
+
+* Fixes lints warnings.
+
+## 0.3.2+1
+
+* Migrates from `ui.hash*` to `Object.hash*`.
+
+## 0.3.2
+
+* Updates package description.
+* Make [MDnsClient.start] idempotent.
+
 ## 0.3.1
 
 * Close IPv6 sockets on [MDnsClient.stop].

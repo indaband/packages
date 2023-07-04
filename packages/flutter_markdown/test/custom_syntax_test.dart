@@ -112,6 +112,30 @@ void defineTests() {
       expect(widgetSpan.child, isInstanceOf<Container>());
     },
   );
+
+  testWidgets(
+    'Custom rendering of tags without children',
+    (WidgetTester tester) async {
+      const String data = '![alt](/assets/images/logo.png)';
+      await tester.pumpWidget(
+        boilerplate(
+          Markdown(
+            data: data,
+            builders: <String, MarkdownElementBuilder>{
+              'img': ImgBuilder(),
+            },
+          ),
+        ),
+      );
+
+      final Finder imageFinder = find.byType(Image);
+      expect(imageFinder, findsNothing);
+      final Finder textFinder = find.byType(Text);
+      expect(textFinder, findsOneWidget);
+      final Text textWidget = tester.widget(find.byType(Text));
+      expect(textWidget.data, 'foo');
+    },
+  );
 }
 
 class SubscriptSyntax extends md.InlineSyntax {
@@ -160,9 +184,10 @@ class WikilinkSyntax extends md.InlineSyntax {
 
   @override
   bool onMatch(md.InlineParser parser, Match match) {
-    final md.Element el = md.Element.withTag('wikilink');
-    el.attributes['href'] = match[1]!.replaceAll(' ', '_');
-    el.children!.add(md.Element.text('span', match[1]!));
+    final String link = match[1]!;
+    final md.Element el =
+        md.Element('wikilink', <md.Element>[md.Element.text('span', link)])
+          ..attributes['href'] = link.replaceAll(' ', '_');
 
     parser.addNode(el);
     return true;
@@ -222,5 +247,12 @@ class ContainerBuilder2 extends MarkdownElementBuilder {
         ],
       ),
     );
+  }
+}
+
+class ImgBuilder extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    return Text('foo', style: preferredStyle);
   }
 }

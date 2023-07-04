@@ -1,3 +1,22 @@
+## NEXT
+
+* Updates minimum supported SDK version to Flutter 3.3/Dart 2.18.
+* Updates minimum SDK version to Flutter 3.0.
+
+## 4.2.0
+
+* Adds iOS template app icons, updated to square icons with no transparency.
+
+## 4.1.1
+
+* Removes empty Dart file.
+* Opts in to NNBD (which is a no-op) so it's not flagged by pub.dev.
+
+## 4.1.0
+
+* Updates package description.
+* Adds macOS template app icons, updated to Big Sur style.
+
 ## 4.0.0
 
 * Move assets common to all app templates to a new `app_shared` directory

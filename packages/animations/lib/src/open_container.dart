@@ -57,7 +57,7 @@ typedef ClosedCallback<S> = void Function(S data);
 /// container is closed again via the callback provided to [openBuilder] or via
 /// Android's back button, the animation is reversed: The container shrinks back
 /// to its original size while the widget returned by [openBuilder] is faded out
-/// and the widget returned by [openBuilder] is faded back in.
+/// and the widget returned by [closedBuilder] is faded back in.
 ///
 /// By default, the container is in the closed state. During the transition from
 /// closed to open and vice versa the widgets returned by the [openBuilder] and
@@ -80,7 +80,7 @@ class OpenContainer<T extends Object?> extends StatefulWidget {
   /// All arguments except for [key] must not be null. The arguments
   /// [openBuilder] and [closedBuilder] are required.
   const OpenContainer({
-    Key? key,
+    super.key,
     this.closedColor = Colors.white,
     this.openColor = Colors.white,
     this.middleColor,
@@ -99,7 +99,7 @@ class OpenContainer<T extends Object?> extends StatefulWidget {
     this.useRootNavigator = false,
     this.routeSettings,
     this.clipBehavior = Clip.antiAlias,
-  }) : super(key: key);
+  });
 
   /// Background color of the container while it is closed.
   ///
@@ -261,7 +261,7 @@ class OpenContainer<T extends Object?> extends StatefulWidget {
   final Clip clipBehavior;
 
   @override
-  _OpenContainerState<T> createState() => _OpenContainerState<T>();
+  State<OpenContainer<T?>> createState() => _OpenContainerState<T>();
 }
 
 class _OpenContainerState<T> extends State<OpenContainer<T?>> {
@@ -341,11 +341,11 @@ class _OpenContainerState<T> extends State<OpenContainer<T?>> {
 ///    `isVisible` is ignored).
 class _Hideable extends StatefulWidget {
   const _Hideable({
-    Key? key,
-    this.child,
-  }) : super(key: key);
+    super.key,
+    required this.child,
+  });
 
-  final Widget? child;
+  final Widget child;
 
   @override
   State<_Hideable> createState() => _HideableState();
@@ -389,8 +389,11 @@ class _HideableState extends State<_Hideable> {
     if (_placeholderSize != null) {
       return SizedBox.fromSize(size: _placeholderSize);
     }
-    return Opacity(
-      opacity: _visible ? 1.0 : 0.0,
+    return Visibility(
+      visible: _visible,
+      maintainSize: true,
+      maintainState: true,
+      maintainAnimation: true,
       child: widget.child,
     );
   }
@@ -628,7 +631,7 @@ class _OpenContainerRoute<T> extends ModalRoute<T> {
     if (hideableKey.currentState?.isVisible == false) {
       // This route may be disposed without dismissing its animation if it is
       // removed by the navigator.
-      SchedulerBinding.instance!
+      SchedulerBinding.instance
           .addPostFrameCallback((Duration d) => _toggleHideable(hide: false));
     }
     super.dispose();
@@ -662,7 +665,7 @@ class _OpenContainerRoute<T> extends ModalRoute<T> {
     }
 
     if (delayForSourceRoute) {
-      SchedulerBinding.instance!
+      SchedulerBinding.instance
           .addPostFrameCallback(takeMeasurementsInSourceRoute);
     } else {
       takeMeasurementsInSourceRoute();
@@ -819,9 +822,9 @@ class _OpenContainerRoute<T> extends ModalRoute<T> {
                               child: (hideableKey.currentState?.isInTree ??
                                       false)
                                   ? null
-                                  : Opacity(
+                                  : FadeTransition(
                                       opacity: closedOpacityTween!
-                                          .evaluate(animation),
+                                          .animate(animation),
                                       child: Builder(
                                         key: closedBuilderKey,
                                         builder: (BuildContext context) {
@@ -841,8 +844,8 @@ class _OpenContainerRoute<T> extends ModalRoute<T> {
                             child: SizedBox(
                               width: _rectTween.end!.width,
                               height: _rectTween.end!.height,
-                              child: Opacity(
-                                opacity: openOpacityTween!.evaluate(animation),
+                              child: FadeTransition(
+                                opacity: openOpacityTween!.animate(animation),
                                 child: Builder(
                                   key: _openBuilderKey,
                                   builder: (BuildContext context) {

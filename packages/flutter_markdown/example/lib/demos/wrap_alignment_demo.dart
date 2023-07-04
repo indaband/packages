@@ -5,7 +5,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import '../shared/dropdown_menu.dart';
+import 'package:markdown/markdown.dart' as md;
+import '../shared/dropdown_menu.dart' as dropdown;
 import '../shared/markdown_demo_widget.dart';
 import '../shared/markdown_extensions.dart';
 
@@ -27,8 +28,10 @@ spacing parameter. The Markdown widget lays out block elements in a column using
 spacing parameter sets the height of the **SizedBox**.
 ''';
 
+// TODO(goderbauer): Restructure the examples to avoid this ignore, https://github.com/flutter/flutter/issues/110208.
+// ignore: avoid_implementing_value_types
 class WrapAlignmentDemo extends StatefulWidget implements MarkdownDemoWidget {
-  const WrapAlignmentDemo({Key? key}) : super(key: key);
+  const WrapAlignmentDemo({super.key});
 
   static const String _title = 'Wrap Alignment Demo';
 
@@ -47,7 +50,7 @@ class WrapAlignmentDemo extends StatefulWidget implements MarkdownDemoWidget {
   Future<String> get notes => Future<String>.value(_notes);
 
   @override
-  _WrapAlignmentDemoState createState() => _WrapAlignmentDemoState();
+  State<WrapAlignmentDemo> createState() => _WrapAlignmentDemoState();
 }
 
 class _WrapAlignmentDemoState extends State<WrapAlignmentDemo> {
@@ -76,7 +79,7 @@ class _WrapAlignmentDemoState extends State<WrapAlignmentDemo> {
         if (snapshot.connectionState == ConnectionState.done) {
           return Column(
             children: <Widget>[
-              DropdownMenu<WrapAlignment>(
+              dropdown.DropdownMenu<WrapAlignment>(
                 items: _wrapAlignmentMenuItems,
                 label: 'Wrap Alignment:',
                 initialValue: _wrapAlignment,
@@ -88,7 +91,7 @@ class _WrapAlignmentDemoState extends State<WrapAlignmentDemo> {
                   }
                 },
               ),
-              DropdownMenu<double>(
+              dropdown.DropdownMenu<double>(
                 items: _blockSpacingMenuItems,
                 label: 'Block Spacing:',
                 initialValue: _blockSpacing,
@@ -109,17 +112,27 @@ class _WrapAlignmentDemoState extends State<WrapAlignmentDemo> {
                       MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
                     blockSpacing: _blockSpacing,
                     textAlign: _wrapAlignment,
+                    pPadding: const EdgeInsets.only(bottom: 4.0),
                     h1Align: _wrapAlignment,
+                    h1Padding: const EdgeInsets.only(left: 4.0),
                     h2Align: _wrapAlignment,
+                    h2Padding: const EdgeInsets.only(left: 8.0),
                     h3Align: _wrapAlignment,
+                    h3Padding: const EdgeInsets.only(left: 12.0),
                     h4Align: _wrapAlignment,
+                    h4Padding: const EdgeInsets.only(left: 16.0),
                     h5Align: _wrapAlignment,
+                    h5Padding: const EdgeInsets.only(left: 20.0),
                     h6Align: _wrapAlignment,
+                    h6Padding: const EdgeInsets.only(left: 24.0),
                     unorderedListAlign: _wrapAlignment,
                     orderedListAlign: _wrapAlignment,
                     blockquoteAlign: _wrapAlignment,
                     codeblockAlign: _wrapAlignment,
                   ),
+                  paddingBuilders: <String, MarkdownPaddingBuilder>{
+                    'p': CustomPaddingBuilder()
+                  },
                 ),
               ),
             ],
@@ -129,5 +142,30 @@ class _WrapAlignmentDemoState extends State<WrapAlignmentDemo> {
         }
       },
     );
+  }
+}
+
+class CustomPaddingBuilder extends MarkdownPaddingBuilder {
+  final EdgeInsets _padding = const EdgeInsets.only(left: 10.0);
+  bool paddingUse = true;
+
+  @override
+  void visitElementBefore(md.Element element) {
+    if (element.children!.length == 1 && element.children![0] is md.Element) {
+      final md.Element child = element.children![0] as md.Element;
+
+      paddingUse = child.tag != 'img';
+    } else {
+      paddingUse = true;
+    }
+  }
+
+  @override
+  EdgeInsets getPadding() {
+    if (paddingUse) {
+      return _padding;
+    } else {
+      return EdgeInsets.zero;
+    }
   }
 }

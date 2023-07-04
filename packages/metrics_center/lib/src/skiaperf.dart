@@ -2,12 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:convert';
 
 import 'package:gcloud/storage.dart';
-import 'package:googleapis/storage/v1.dart' show DetailedApiRequestError;
+import 'package:googleapis/storage/v1.dart'
+    show DetailedApiRequestError, StorageApi;
 import 'package:googleapis_auth/auth_io.dart';
-import 'package:googleapis_auth/googleapis_auth.dart';
 
 import 'common.dart';
 import 'constants.dart';
@@ -83,8 +85,9 @@ class SkiaPerfPoint extends MetricPoint {
     final String? name = p.tags[kNameKey];
 
     if (githubRepo == null || gitHash == null || name == null) {
-      throw '$kGithubRepoKey, $kGitRevisionKey, $kNameKey must be set in'
-          ' the tags of $p.';
+      throw StateError(
+          '$kGithubRepoKey, $kGitRevisionKey, $kNameKey must be set in'
+          ' the tags of $p.');
     }
 
     final String subResult = p.tags[kSubResultKey] ?? kSkiaPerfValueKey;
@@ -199,7 +202,7 @@ class SkiaPerfPoint extends MetricPoint {
 class SkiaPerfGcsAdaptor {
   /// Construct the adaptor given the associated GCS bucket where the data is
   /// read from and written to.
-  SkiaPerfGcsAdaptor(this._gcsBucket) : assert(_gcsBucket != null);
+  SkiaPerfGcsAdaptor(this._gcsBucket);
 
   /// Used by Skia to differentiate json file format versions.
   static const int version = 1;
@@ -283,7 +286,6 @@ class SkiaPerfGcsAdaptor {
     final String firstGcsNameComponent = objectName.split('/')[0];
     _populateGcsNameToGithubRepoMapIfNeeded();
     final String githubRepo = _gcsNameToGithubRepo[firstGcsNameComponent]!;
-    assert(githubRepo != null);
 
     final String? gitHash = decodedJson[kSkiaPerfGitHashKey] as String?;
     final Map<String, dynamic> results =
@@ -383,11 +385,11 @@ class SkiaPerfDestination extends MetricDestination {
     final Storage storage = Storage(client, projectId);
     final String bucketName = isTesting ? kTestBucketName : kBucketName;
     if (!await storage.bucketExists(bucketName)) {
-      throw 'Bucket $bucketName does not exist.';
+      throw StateError('Bucket $bucketName does not exist.');
     }
     final SkiaPerfGcsAdaptor adaptor =
         SkiaPerfGcsAdaptor(storage.bucket(bucketName));
-    final GcsLock lock = GcsLock(client, bucketName);
+    final GcsLock lock = GcsLock(StorageApi(client), bucketName);
     return SkiaPerfDestination(adaptor, lock);
   }
 
@@ -401,12 +403,13 @@ class SkiaPerfDestination extends MetricDestination {
         <String, Map<String, Map<String, SkiaPerfPoint>>>{};
     for (final SkiaPerfPoint p
         in points.map((MetricPoint x) => SkiaPerfPoint.fromPoint(x))) {
-      if (p != null) {
-        pointMap[p.githubRepo] ??= <String, Map<String, SkiaPerfPoint>>{};
-        pointMap[p.githubRepo]![p.gitHash] ??= <String, SkiaPerfPoint>{};
-        pointMap[p.githubRepo]![p.gitHash]![p.id] = p;
-      }
+      pointMap[p.githubRepo] ??= <String, Map<String, SkiaPerfPoint>>{};
+      pointMap[p.githubRepo]![p.gitHash] ??= <String, SkiaPerfPoint>{};
+      pointMap[p.githubRepo]![p.gitHash]![p.id] = p;
     }
+
+    // All created locks must be released before returning
+    final List<Future<void>> lockFutures = <Future<void>>[];
 
     // 2nd, read existing points from the gcs object and update with new ones.
     for (final String repo in pointMap.keys) {
@@ -419,18 +422,21 @@ class SkiaPerfDestination extends MetricDestination {
         // json files according to task names. Skia perf read all json files in
         // the directory so one can use arbitrary names for those sharded json
         // file names.
-        _lock!.protectedRun('$objectName.lock', () async {
-          final List<SkiaPerfPoint> oldPoints =
-              await _gcs.readPoints(objectName);
-          for (final SkiaPerfPoint p in oldPoints) {
-            if (newPoints![p.id] == null) {
-              newPoints[p.id] = p;
+        lockFutures.add(
+          _lock!.protectedRun('$objectName.lock', () async {
+            final List<SkiaPerfPoint> oldPoints =
+                await _gcs.readPoints(objectName);
+            for (final SkiaPerfPoint p in oldPoints) {
+              if (newPoints![p.id] == null) {
+                newPoints[p.id] = p;
+              }
             }
-          }
-          await _gcs.writePoints(objectName, newPoints!.values.toList());
-        });
+            await _gcs.writePoints(objectName, newPoints!.values.toList());
+          }),
+        );
       }
     }
+    await Future.wait(lockFutures);
   }
 
   final SkiaPerfGcsAdaptor _gcs;

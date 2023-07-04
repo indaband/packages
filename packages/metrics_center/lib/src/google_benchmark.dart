@@ -13,8 +13,27 @@ const String _kTimeUnitKey = 'time_unit';
 const List<String> _kNonNumericalValueSubResults = <String>[
   kNameKey,
   _kTimeUnitKey,
+  'aggregate_name',
+  'aggregate_unit',
+  'error_message',
+  'family_index',
+  'per_family_instance_index',
+  'label',
+  'run_name',
+  'run_type',
+  'repetitions',
+  'repetition_index',
+  'threads',
   'iterations',
   'big_o',
+];
+
+// Context has some keys such as 'host_name' which need to be ignored
+// so that we can group series together
+const List<String> _kContextIgnoreKeys = <String>[
+  'host_name',
+  'load_avg',
+  'caches',
 ];
 
 // ignore: avoid_classes_with_only_static_members
@@ -30,9 +49,10 @@ class GoogleBenchmarkParser {
         jsonResult['context'] as Map<String, dynamic>;
     final Map<String, String> context = rawContext.map<String, String>(
       (String k, dynamic v) => MapEntry<String, String>(k, v.toString()),
-    );
+    )..removeWhere((String k, String v) => _kContextIgnoreKeys.contains(k));
+
     final List<MetricPoint> points = <MetricPoint>[];
-    for (final dynamic item in jsonResult['benchmarks']) {
+    for (final dynamic item in jsonResult['benchmarks'] as List<dynamic>) {
       _parseAnItem(item as Map<String, dynamic>, points, context);
     }
     return points;
@@ -46,7 +66,7 @@ void _parseAnItem(
 ) {
   final String name = item[kNameKey] as String;
   final Map<String, String> timeUnitMap = <String, String>{
-    kUnitKey: item[_kTimeUnitKey] as String
+    if (item.containsKey(_kTimeUnitKey)) kUnitKey: item[_kTimeUnitKey] as String
   };
   for (final String subResult in item.keys) {
     if (!_kNonNumericalValueSubResults.contains(subResult)) {
@@ -54,8 +74,9 @@ void _parseAnItem(
       try {
         rawValue = item[subResult] as num?;
       } catch (e) {
+        // ignore: avoid_print
         print(
-            '$subResult: ${item[subResult]} (${item[subResult].runtimeType}) is not a number');
+            '$subResult: ${item[subResult]} (${(item[subResult] as Object?).runtimeType}) is not a number');
         rethrow;
       }
 
