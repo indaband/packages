@@ -451,6 +451,43 @@ NS_INLINE UIViewController *rootViewController(void) {
       completionHandler:completionHandler];
 }
 
+- (FLTGetAvailableTracksMessage *)getAvailableTracks {
+  AVAsset *asset = [_player.currentItem asset];
+  NSArray *array = asset.availableMediaCharacteristicsWithMediaSelectionOptions;
+  NSArray *medias = @[];
+  NSString *selectedTrack = @"";
+    
+  for (NSString * string in array) {
+    AVMediaSelectionGroup * group = [asset mediaSelectionGroupForMediaCharacteristic:string];
+    
+    for (AVMediaSelectionOption * option in group.options) {
+        AVMetadataItem  *title = [AVMetadataItem metadataItemsFromArray:option.commonMetadata withKey:@"title" keySpace:AVMetadataKeySpaceCommon].firstObject;
+        if (title != nil) {
+            medias = [medias arrayByAddingObject:title.value];
+        }
+    }
+  }
+
+ FLTGetAvailableTracksMessage *result = [FLTGetAvailableTracksMessage makeWithTracks:medias selectedTrack:selectedTrack];
+ return result;
+}
+
+- (void)selectTrack:(NSString *)track {
+    AVAsset *asset = [_player.currentItem asset];
+    NSArray *array = asset.availableMediaCharacteristicsWithMediaSelectionOptions;
+    
+    for (NSString * string in array) {
+      AVMediaSelectionGroup * group = [asset mediaSelectionGroupForMediaCharacteristic:string];
+      
+      for (AVMediaSelectionOption * option in group.options) {
+          AVMetadataItem  *title = [AVMetadataItem metadataItemsFromArray:option.commonMetadata withKey:@"title" keySpace:AVMetadataKeySpaceCommon].firstObject;
+          if (title != nil && [track isEqualToString:title.value]) {
+              [_player.currentItem selectMediaOption:option inMediaSelectionGroup:group];
+          }
+      }
+    }
+}
+
 - (void)setIsLooping:(BOOL)isLooping {
   _isLooping = isLooping;
 }
@@ -715,6 +752,17 @@ NS_INLINE UIViewController *rootViewController(void) {
   // } else {
   //   [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
   // }
+}
+
+- (FLTGetAvailableTracksMessage *)getAvailableTracks:(FLTTextureMessage *)input error:(FlutterError **)error {
+    FLTVideoPlayer *player = self.playersByTextureId[input.textureId];
+    return [player getAvailableTracks];
+}
+
+- (void)selectTrack:(FLTSelectTrackMessage *)input
+                   error:(FlutterError *_Nullable __autoreleasing *)error {
+  FLTVideoPlayer *player = self.playersByTextureId[input.textureId];
+  return [player selectTrack:input.track];
 }
 
 @end

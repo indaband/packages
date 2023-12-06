@@ -16,6 +16,10 @@ import io.flutter.plugin.common.StandardMessageCodec;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** Generated class from Pigeon. */
@@ -31,7 +35,8 @@ public class Messages {
     /** The error details. Must be a datatype supported by the api codec. */
     public final Object details;
 
-    public FlutterError(@NonNull String code, @Nullable String message, @Nullable Object details) {
+    public FlutterError(@NonNull String code, @Nullable String message, @Nullable Object details) 
+    {
       super(message);
       this.code = code;
       this.details = details;
@@ -50,7 +55,7 @@ public class Messages {
       errorList.add(exception.toString());
       errorList.add(exception.getClass().getSimpleName());
       errorList.add(
-          "Cause: " + exception.getCause() + ", Stacktrace: " + Log.getStackTraceString(exception));
+        "Cause: " + exception.getCause() + ", Stacktrace: " + Log.getStackTraceString(exception));
     }
     return errorList;
   }
@@ -99,10 +104,7 @@ public class Messages {
     static @NonNull TextureMessage fromList(@NonNull ArrayList<Object> list) {
       TextureMessage pigeonResult = new TextureMessage();
       Object textureId = list.get(0);
-      pigeonResult.setTextureId(
-          (textureId == null)
-              ? null
-              : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
+      pigeonResult.setTextureId((textureId == null) ? null : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
       return pigeonResult;
     }
   }
@@ -173,10 +175,7 @@ public class Messages {
     static @NonNull LoopingMessage fromList(@NonNull ArrayList<Object> list) {
       LoopingMessage pigeonResult = new LoopingMessage();
       Object textureId = list.get(0);
-      pigeonResult.setTextureId(
-          (textureId == null)
-              ? null
-              : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
+      pigeonResult.setTextureId((textureId == null) ? null : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
       Object isLooping = list.get(1);
       pigeonResult.setIsLooping((Boolean) isLooping);
       return pigeonResult;
@@ -249,10 +248,7 @@ public class Messages {
     static @NonNull VolumeMessage fromList(@NonNull ArrayList<Object> list) {
       VolumeMessage pigeonResult = new VolumeMessage();
       Object textureId = list.get(0);
-      pigeonResult.setTextureId(
-          (textureId == null)
-              ? null
-              : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
+      pigeonResult.setTextureId((textureId == null) ? null : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
       Object volume = list.get(1);
       pigeonResult.setVolume((Double) volume);
       return pigeonResult;
@@ -325,10 +321,7 @@ public class Messages {
     static @NonNull PlaybackSpeedMessage fromList(@NonNull ArrayList<Object> list) {
       PlaybackSpeedMessage pigeonResult = new PlaybackSpeedMessage();
       Object textureId = list.get(0);
-      pigeonResult.setTextureId(
-          (textureId == null)
-              ? null
-              : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
+      pigeonResult.setTextureId((textureId == null) ? null : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
       Object speed = list.get(1);
       pigeonResult.setSpeed((Double) speed);
       return pigeonResult;
@@ -401,15 +394,9 @@ public class Messages {
     static @NonNull PositionMessage fromList(@NonNull ArrayList<Object> list) {
       PositionMessage pigeonResult = new PositionMessage();
       Object textureId = list.get(0);
-      pigeonResult.setTextureId(
-          (textureId == null)
-              ? null
-              : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
+      pigeonResult.setTextureId((textureId == null) ? null : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
       Object position = list.get(1);
-      pigeonResult.setPosition(
-          (position == null)
-              ? null
-              : ((position instanceof Integer) ? (Integer) position : (Long) position));
+      pigeonResult.setPosition((position == null) ? null : ((position instanceof Integer) ? (Integer) position : (Long) position));
       return pigeonResult;
     }
   }
@@ -596,6 +583,149 @@ public class Messages {
     }
   }
 
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static final class SelectTrackMessage {
+    private @NonNull String track;
+
+    public @NonNull String getTrack() {
+      return track;
+    }
+
+    public void setTrack(@NonNull String setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"track\" is null.");
+      }
+      this.track = setterArg;
+    }
+
+    private @NonNull Long textureId;
+
+    public @NonNull Long getTextureId() {
+      return textureId;
+    }
+
+    public void setTextureId(@NonNull Long setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"textureId\" is null.");
+      }
+      this.textureId = setterArg;
+    }
+
+    /** Constructor is non-public to enforce null safety; use Builder. */
+    SelectTrackMessage() {}
+
+    public static final class Builder {
+
+      private @Nullable String track;
+
+      public @NonNull Builder setTrack(@NonNull String setterArg) {
+        this.track = setterArg;
+        return this;
+      }
+
+      private @Nullable Long textureId;
+
+      public @NonNull Builder setTextureId(@NonNull Long setterArg) {
+        this.textureId = setterArg;
+        return this;
+      }
+
+      public @NonNull SelectTrackMessage build() {
+        SelectTrackMessage pigeonReturn = new SelectTrackMessage();
+        pigeonReturn.setTrack(track);
+        pigeonReturn.setTextureId(textureId);
+        return pigeonReturn;
+      }
+    }
+
+    @NonNull
+    ArrayList<Object> toList() {
+      ArrayList<Object> toListResult = new ArrayList<Object>(2);
+      toListResult.add(track);
+      toListResult.add(textureId);
+      return toListResult;
+    }
+
+    static @NonNull SelectTrackMessage fromList(@NonNull ArrayList<Object> list) {
+      SelectTrackMessage pigeonResult = new SelectTrackMessage();
+      Object track = list.get(0);
+      pigeonResult.setTrack((String) track);
+      Object textureId = list.get(1);
+      pigeonResult.setTextureId((textureId == null) ? null : ((textureId instanceof Integer) ? (Integer) textureId : (Long) textureId));
+      return pigeonResult;
+    }
+  }
+
+  /** Generated class from Pigeon that represents data sent in messages. */
+  public static final class GetAvailableTracksMessage {
+    private @NonNull List<String> tracks;
+
+    public @NonNull List<String> getTracks() {
+      return tracks;
+    }
+
+    public void setTracks(@NonNull List<String> setterArg) {
+      if (setterArg == null) {
+        throw new IllegalStateException("Nonnull field \"tracks\" is null.");
+      }
+      this.tracks = setterArg;
+    }
+
+    private @Nullable String selectedTrack;
+
+    public @Nullable String getSelectedTrack() {
+      return selectedTrack;
+    }
+
+    public void setSelectedTrack(@Nullable String setterArg) {
+      this.selectedTrack = setterArg;
+    }
+
+    /** Constructor is non-public to enforce null safety; use Builder. */
+    GetAvailableTracksMessage() {}
+
+    public static final class Builder {
+
+      private @Nullable List<String> tracks;
+
+      public @NonNull Builder setTracks(@NonNull List<String> setterArg) {
+        this.tracks = setterArg;
+        return this;
+      }
+
+      private @Nullable String selectedTrack;
+
+      public @NonNull Builder setSelectedTrack(@Nullable String setterArg) {
+        this.selectedTrack = setterArg;
+        return this;
+      }
+
+      public @NonNull GetAvailableTracksMessage build() {
+        GetAvailableTracksMessage pigeonReturn = new GetAvailableTracksMessage();
+        pigeonReturn.setTracks(tracks);
+        pigeonReturn.setSelectedTrack(selectedTrack);
+        return pigeonReturn;
+      }
+    }
+
+    @NonNull
+    ArrayList<Object> toList() {
+      ArrayList<Object> toListResult = new ArrayList<Object>(2);
+      toListResult.add(tracks);
+      toListResult.add(selectedTrack);
+      return toListResult;
+    }
+
+    static @NonNull GetAvailableTracksMessage fromList(@NonNull ArrayList<Object> list) {
+      GetAvailableTracksMessage pigeonResult = new GetAvailableTracksMessage();
+      Object tracks = list.get(0);
+      pigeonResult.setTracks((List<String>) tracks);
+      Object selectedTrack = list.get(1);
+      pigeonResult.setSelectedTrack((String) selectedTrack);
+      return pigeonResult;
+    }
+  }
+
   private static class AndroidVideoPlayerApiCodec extends StandardMessageCodec {
     public static final AndroidVideoPlayerApiCodec INSTANCE = new AndroidVideoPlayerApiCodec();
 
@@ -607,16 +737,20 @@ public class Messages {
         case (byte) 128:
           return CreateMessage.fromList((ArrayList<Object>) readValue(buffer));
         case (byte) 129:
-          return LoopingMessage.fromList((ArrayList<Object>) readValue(buffer));
+          return GetAvailableTracksMessage.fromList((ArrayList<Object>) readValue(buffer));
         case (byte) 130:
-          return MixWithOthersMessage.fromList((ArrayList<Object>) readValue(buffer));
+          return LoopingMessage.fromList((ArrayList<Object>) readValue(buffer));
         case (byte) 131:
-          return PlaybackSpeedMessage.fromList((ArrayList<Object>) readValue(buffer));
+          return MixWithOthersMessage.fromList((ArrayList<Object>) readValue(buffer));
         case (byte) 132:
-          return PositionMessage.fromList((ArrayList<Object>) readValue(buffer));
+          return PlaybackSpeedMessage.fromList((ArrayList<Object>) readValue(buffer));
         case (byte) 133:
-          return TextureMessage.fromList((ArrayList<Object>) readValue(buffer));
+          return PositionMessage.fromList((ArrayList<Object>) readValue(buffer));
         case (byte) 134:
+          return SelectTrackMessage.fromList((ArrayList<Object>) readValue(buffer));
+        case (byte) 135:
+          return TextureMessage.fromList((ArrayList<Object>) readValue(buffer));
+        case (byte) 136:
           return VolumeMessage.fromList((ArrayList<Object>) readValue(buffer));
         default:
           return super.readValueOfType(type, buffer);
@@ -628,23 +762,29 @@ public class Messages {
       if (value instanceof CreateMessage) {
         stream.write(128);
         writeValue(stream, ((CreateMessage) value).toList());
-      } else if (value instanceof LoopingMessage) {
+      } else if (value instanceof GetAvailableTracksMessage) {
         stream.write(129);
+        writeValue(stream, ((GetAvailableTracksMessage) value).toList());
+      } else if (value instanceof LoopingMessage) {
+        stream.write(130);
         writeValue(stream, ((LoopingMessage) value).toList());
       } else if (value instanceof MixWithOthersMessage) {
-        stream.write(130);
+        stream.write(131);
         writeValue(stream, ((MixWithOthersMessage) value).toList());
       } else if (value instanceof PlaybackSpeedMessage) {
-        stream.write(131);
+        stream.write(132);
         writeValue(stream, ((PlaybackSpeedMessage) value).toList());
       } else if (value instanceof PositionMessage) {
-        stream.write(132);
-        writeValue(stream, ((PositionMessage) value).toList());
-      } else if (value instanceof TextureMessage) {
         stream.write(133);
+        writeValue(stream, ((PositionMessage) value).toList());
+      } else if (value instanceof SelectTrackMessage) {
+        stream.write(134);
+        writeValue(stream, ((SelectTrackMessage) value).toList());
+      } else if (value instanceof TextureMessage) {
+        stream.write(135);
         writeValue(stream, ((TextureMessage) value).toList());
       } else if (value instanceof VolumeMessage) {
-        stream.write(134);
+        stream.write(136);
         writeValue(stream, ((VolumeMessage) value).toList());
       } else {
         super.writeValue(stream, value);
@@ -657,7 +797,7 @@ public class Messages {
 
     void initialize();
 
-    @NonNull
+    @NonNull 
     TextureMessage create(@NonNull CreateMessage msg);
 
     void dispose(@NonNull TextureMessage msg);
@@ -670,7 +810,7 @@ public class Messages {
 
     void play(@NonNull TextureMessage msg);
 
-    @NonNull
+    @NonNull 
     PositionMessage position(@NonNull TextureMessage msg);
 
     void seekTo(@NonNull PositionMessage msg);
@@ -679,16 +819,17 @@ public class Messages {
 
     void setMixWithOthers(@NonNull MixWithOthersMessage msg);
 
+    @NonNull 
+    GetAvailableTracksMessage getAvailableTracks(@NonNull TextureMessage msg);
+
+    void selectTrack(@NonNull SelectTrackMessage msg);
+
     /** The codec used by AndroidVideoPlayerApi. */
     static @NonNull MessageCodec<Object> getCodec() {
       return AndroidVideoPlayerApiCodec.INSTANCE;
     }
-    /**
-     * Sets up an instance of `AndroidVideoPlayerApi` to handle messages through the
-     * `binaryMessenger`.
-     */
-    static void setup(
-        @NonNull BinaryMessenger binaryMessenger, @Nullable AndroidVideoPlayerApi api) {
+    /**Sets up an instance of `AndroidVideoPlayerApi` to handle messages through the `binaryMessenger`. */
+    static void setup(@NonNull BinaryMessenger binaryMessenger, @Nullable AndroidVideoPlayerApi api) {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
@@ -700,7 +841,8 @@ public class Messages {
                 try {
                   api.initialize();
                   wrapped.add(0, null);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -723,7 +865,8 @@ public class Messages {
                 try {
                   TextureMessage output = api.create(msgArg);
                   wrapped.add(0, output);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -746,7 +889,8 @@ public class Messages {
                 try {
                   api.dispose(msgArg);
                   wrapped.add(0, null);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -769,7 +913,8 @@ public class Messages {
                 try {
                   api.setLooping(msgArg);
                   wrapped.add(0, null);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -792,7 +937,8 @@ public class Messages {
                 try {
                   api.setVolume(msgArg);
                   wrapped.add(0, null);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -805,9 +951,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger,
-                "dev.flutter.pigeon.AndroidVideoPlayerApi.setPlaybackSpeed",
-                getCodec());
+                binaryMessenger, "dev.flutter.pigeon.AndroidVideoPlayerApi.setPlaybackSpeed", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -817,7 +961,8 @@ public class Messages {
                 try {
                   api.setPlaybackSpeed(msgArg);
                   wrapped.add(0, null);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -840,7 +985,8 @@ public class Messages {
                 try {
                   api.play(msgArg);
                   wrapped.add(0, null);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -863,7 +1009,8 @@ public class Messages {
                 try {
                   PositionMessage output = api.position(msgArg);
                   wrapped.add(0, output);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -886,7 +1033,8 @@ public class Messages {
                 try {
                   api.seekTo(msgArg);
                   wrapped.add(0, null);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -909,7 +1057,8 @@ public class Messages {
                 try {
                   api.pause(msgArg);
                   wrapped.add(0, null);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }
@@ -922,9 +1071,7 @@ public class Messages {
       {
         BasicMessageChannel<Object> channel =
             new BasicMessageChannel<>(
-                binaryMessenger,
-                "dev.flutter.pigeon.AndroidVideoPlayerApi.setMixWithOthers",
-                getCodec());
+                binaryMessenger, "dev.flutter.pigeon.AndroidVideoPlayerApi.setMixWithOthers", getCodec());
         if (api != null) {
           channel.setMessageHandler(
               (message, reply) -> {
@@ -934,7 +1081,56 @@ public class Messages {
                 try {
                   api.setMixWithOthers(msgArg);
                   wrapped.add(0, null);
-                } catch (Throwable exception) {
+                }
+ catch (Throwable exception) {
+                  ArrayList<Object> wrappedError = wrapError(exception);
+                  wrapped = wrappedError;
+                }
+                reply.reply(wrapped);
+              });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(
+                binaryMessenger, "dev.flutter.pigeon.AndroidVideoPlayerApi.getAvailableTracks", getCodec());
+        if (api != null) {
+          channel.setMessageHandler(
+              (message, reply) -> {
+                ArrayList<Object> wrapped = new ArrayList<Object>();
+                ArrayList<Object> args = (ArrayList<Object>) message;
+                TextureMessage msgArg = (TextureMessage) args.get(0);
+                try {
+                  GetAvailableTracksMessage output = api.getAvailableTracks(msgArg);
+                  wrapped.add(0, output);
+                }
+ catch (Throwable exception) {
+                  ArrayList<Object> wrappedError = wrapError(exception);
+                  wrapped = wrappedError;
+                }
+                reply.reply(wrapped);
+              });
+        } else {
+          channel.setMessageHandler(null);
+        }
+      }
+      {
+        BasicMessageChannel<Object> channel =
+            new BasicMessageChannel<>(
+                binaryMessenger, "dev.flutter.pigeon.AndroidVideoPlayerApi.selectTrack", getCodec());
+        if (api != null) {
+          channel.setMessageHandler(
+              (message, reply) -> {
+                ArrayList<Object> wrapped = new ArrayList<Object>();
+                ArrayList<Object> args = (ArrayList<Object>) message;
+                SelectTrackMessage msgArg = (SelectTrackMessage) args.get(0);
+                try {
+                  api.selectTrack(msgArg);
+                  wrapped.add(0, null);
+                }
+ catch (Throwable exception) {
                   ArrayList<Object> wrappedError = wrapError(exception);
                   wrapped = wrappedError;
                 }

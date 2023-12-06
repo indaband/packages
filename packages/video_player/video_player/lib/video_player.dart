@@ -14,7 +14,7 @@ import 'package:video_player_platform_interface/video_player_platform_interface.
 import 'src/closed_caption_file.dart';
 
 export 'package:video_player_platform_interface/video_player_platform_interface.dart'
-    show DurationRange, DataSourceType, VideoFormat, VideoPlayerOptions;
+    show DurationRange, DataSourceType, VideoFormat, VideoPlayerOptions, Track;
 
 export 'src/closed_caption_file.dart';
 
@@ -750,6 +750,16 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   }
 
   bool get _isDisposedOrNotInitialized => _isDisposed || !value.isInitialized;
+
+  /// Returns a list of available tracks
+  Future<List<Track>> getAvailableTracks() async {
+    return _videoPlayerPlatform.getAvailableTracks(_textureId);
+  }
+
+  /// Selects a track
+  void selectTrack(Track track) {
+    _videoPlayerPlatform.selectTrack(_textureId, track.name);
+  }
 }
 
 class _VideoAppLifeCycleObserver extends Object with WidgetsBindingObserver {

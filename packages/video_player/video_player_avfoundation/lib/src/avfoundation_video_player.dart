@@ -168,6 +168,29 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
         .setMixWithOthers(MixWithOthersMessage(mixWithOthers: mixWithOthers));
   }
 
+  @override
+  Future<List<Track>> getAvailableTracks(int textureId) async {
+    final GetAvailableTracksMessage msg = await _api.getAvailableTracks(
+      TextureMessage(textureId: textureId),
+    );
+    return msg.tracks
+        .map<String>((String? t) => t ?? '')
+        .where((String t) => t.isNotEmpty)
+        .map((String t) => Track(t, t == (msg.selectedTrack ?? '')))
+        .toList();
+  }
+
+  @override
+  Future<void> selectTrack(int textureId, String track) async {
+    return _api.selectTrack(
+      SelectTrackMessage(
+        track: track,
+        textureId: textureId,
+      ),
+    );
+  }
+
+  @override
   EventChannel _eventChannelFor(int textureId) {
     return EventChannel('flutter.io/videoPlayer/videoEvents$textureId');
   }
