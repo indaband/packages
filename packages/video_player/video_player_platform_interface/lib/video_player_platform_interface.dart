@@ -102,9 +102,31 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   Future<void> setMixWithOthers(bool mixWithOthers) {
     throw UnimplementedError('setMixWithOthers() has not been implemented.');
   }
+
+  /// Returns a list of available video tracks
+  Future<List<Track>> getAvailableTracks(int textureId) {
+    throw UnimplementedError('getAvailableTracks() has not been implemented.');
+  }
+
+  /// Selects a video track
+  Future<void> selectTrack(int textureId, String track) {
+    throw UnimplementedError('selectTrack() has not been implemented.');
+  }
 }
 
 class _PlaceholderImplementation extends VideoPlayerPlatform {}
+
+/// Pepresents a media track
+class Track {
+  /// Creates a new track
+  const Track(this.name, [this.selected = false]);
+
+  /// Represents a track name
+  final String name;
+
+  /// Informs if the track is selected
+  final bool selected;
+}
 
 /// Description of the data source used to create an instance of
 /// the video player.

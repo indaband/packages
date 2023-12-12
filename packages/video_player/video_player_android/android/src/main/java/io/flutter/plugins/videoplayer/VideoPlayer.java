@@ -30,15 +30,18 @@ import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.view.TextureRegistry;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import io.flutter.plugins.videoplayer.Messages.GetAvailableTracksMessage;
 
 final class VideoPlayer {
   private static final String FORMAT_SS = "ss";
@@ -290,6 +293,47 @@ final class VideoPlayer {
 
   long getPosition() {
     return exoPlayer.getCurrentPosition();
+  }
+
+  GetAvailableTracksMessage getAvailableTracks() {
+    ArrayList<String> tracks = new ArrayList<String>();
+    String selected = new String();
+
+    for (int i = 0; i < exoPlayer.getCurrentTracks().getGroups().size(); i++) {
+      if (exoPlayer.getCurrentTracks().getGroups().get(i).getTrackFormat(0).label != null) {
+        tracks.add(exoPlayer.getCurrentTracks().getGroups().get(i).getTrackFormat(0).label);
+        
+        if (exoPlayer.getCurrentTracks().getGroups().get(i).isSelected()) {
+          selected = exoPlayer.getCurrentTracks().getGroups().get(i).getTrackFormat(0).label;
+        }
+      }
+    }
+
+    GetAvailableTracksMessage result = new GetAvailableTracksMessage.Builder()
+      .setTracks(tracks)
+       .setSelectedTrack(selected)
+      .build();
+    return result;
+  }
+
+  void selectTrack(String track) {
+    int groupId = -1;
+    for (int i = 0; i < exoPlayer.getCurrentTracks().getGroups().size(); i++) {
+      if (exoPlayer.getCurrentTracks().getGroups().get(i).getTrackFormat(0).label == track) {
+        groupId = i;
+      }
+   }
+    
+    if (groupId  != -1) {
+      exoPlayer.setTrackSelectionParameters(
+          exoPlayer.getTrackSelectionParameters()
+              .buildUpon()
+              .setOverrideForType(
+                  new TrackSelectionOverride(
+                      exoPlayer.getCurrentTracks().getGroups().get(groupId).getMediaTrackGroup(),
+                      /* trackIndex= */ 0))
+              .build());
+    }
   }
 
   @SuppressWarnings("SuspiciousNameCombination")

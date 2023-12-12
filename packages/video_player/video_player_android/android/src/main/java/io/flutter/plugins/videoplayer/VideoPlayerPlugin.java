@@ -20,10 +20,13 @@ import io.flutter.plugins.videoplayer.Messages.MixWithOthersMessage;
 import io.flutter.plugins.videoplayer.Messages.PlaybackSpeedMessage;
 import io.flutter.plugins.videoplayer.Messages.PositionMessage;
 import io.flutter.plugins.videoplayer.Messages.TextureMessage;
+import io.flutter.plugins.videoplayer.Messages.SelectTrackMessage;
 import io.flutter.plugins.videoplayer.Messages.VolumeMessage;
+import io.flutter.plugins.videoplayer.Messages.GetAvailableTracksMessage;
 import io.flutter.view.TextureRegistry;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
@@ -210,6 +213,16 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
   @Override
   public void setMixWithOthers(@NonNull MixWithOthersMessage arg) {
     options.mixWithOthers = arg.getMixWithOthers();
+  }
+
+  public GetAvailableTracksMessage getAvailableTracks(@NonNull TextureMessage arg) {
+    VideoPlayer player = videoPlayers.get(arg.getTextureId());
+    return player.getAvailableTracks();
+  }
+
+  public void selectTrack(@NonNull SelectTrackMessage arg) {
+    VideoPlayer player = videoPlayers.get(arg.getTextureId());
+    player.selectTrack(arg.getTrack());
   }
 
   private interface KeyForAssetFn {
