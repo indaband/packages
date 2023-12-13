@@ -319,7 +319,7 @@ final class VideoPlayer {
   void selectTrack(String track) {
     int groupId = -1;
     for (int i = 0; i < exoPlayer.getCurrentTracks().getGroups().size(); i++) {
-      if (exoPlayer.getCurrentTracks().getGroups().get(i).getTrackFormat(0).label == track) {
+      if (track.equals(exoPlayer.getCurrentTracks().getGroups().get(i).getTrackFormat(0).label)) {
         groupId = i;
       }
    }
