@@ -207,6 +207,12 @@ final class VideoPlayer {
           }
 
           @Override
+          public void onEvents(Player player, Player.Events events) {
+            sendBufferingUpdate();
+            Listener.super.onEvents(player, events);
+          }
+
+          @Override
           public void onPlaybackStateChanged(final int playbackState) {
             if (playbackState == Player.STATE_BUFFERING) {
               setBuffering(true);
@@ -302,7 +308,7 @@ final class VideoPlayer {
     for (int i = 0; i < exoPlayer.getCurrentTracks().getGroups().size(); i++) {
       if (exoPlayer.getCurrentTracks().getGroups().get(i).getTrackFormat(0).label != null) {
         tracks.add(exoPlayer.getCurrentTracks().getGroups().get(i).getTrackFormat(0).label);
-        
+
         if (exoPlayer.getCurrentTracks().getGroups().get(i).isSelected()) {
           selected = exoPlayer.getCurrentTracks().getGroups().get(i).getTrackFormat(0).label;
         }
@@ -323,7 +329,7 @@ final class VideoPlayer {
         groupId = i;
       }
    }
-    
+
     if (groupId  != -1) {
       exoPlayer.setTrackSelectionParameters(
           exoPlayer.getTrackSelectionParameters()
