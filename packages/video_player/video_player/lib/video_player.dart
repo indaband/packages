@@ -52,6 +52,7 @@ class VideoPlayerValue {
     this.playbackSpeed = 1.0,
     this.rotationCorrection = 0,
     this.errorDescription,
+    this.isCompleted = false,
   });
 
   /// Returns an instance for a video that hasn't been loaded.
