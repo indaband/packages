@@ -50,6 +50,7 @@ class CreateMessage {
   String? packageName;
   String? formatHint;
   Map<String?, String?> httpHeaders;
+  int? initialPosition;
 }
 
 class MixWithOthersMessage {

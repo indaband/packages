@@ -64,7 +64,8 @@
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
                 httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers
-              playerFactory:(id<FVPPlayerFactory>)playerFactory;
+              playerFactory:(id<FVPPlayerFactory>)playerFactory
+            initialPosition:(int64_t)initialPosition;
 @end
 
 static void *timeRangeContext = &timeRangeContext;
@@ -79,12 +80,14 @@ static void *rateContext = &rateContext;
 @implementation FLTVideoPlayer
 - (instancetype)initWithAsset:(NSString *)asset
                  frameUpdater:(FLTFrameUpdater *)frameUpdater
-                playerFactory:(id<FVPPlayerFactory>)playerFactory {
+                playerFactory:(id<FVPPlayerFactory>)playerFactory
+              initialPosition:(int64_t)initialPosition {
   NSString *path = [[NSBundle mainBundle] pathForResource:asset ofType:nil];
   return [self initWithURL:[NSURL fileURLWithPath:path]
               frameUpdater:frameUpdater
                httpHeaders:@{}
-             playerFactory:playerFactory];
+             playerFactory:playerFactory
+           initialPosition:initialPosition];
 }
 
 - (void)addObserversForItem:(AVPlayerItem *)item player:(AVPlayer *)player {
@@ -221,19 +224,21 @@ NS_INLINE UIViewController *rootViewController(void) {
 - (instancetype)initWithURL:(NSURL *)url
                frameUpdater:(FLTFrameUpdater *)frameUpdater
                 httpHeaders:(nonnull NSDictionary<NSString *, NSString *> *)headers
-              playerFactory:(id<FVPPlayerFactory>)playerFactory {
+              playerFactory:(id<FVPPlayerFactory>)playerFactory
+            initialPosition:(int64_t)initialPosition {
   NSDictionary<NSString *, id> *options = nil;
   if ([headers count] != 0) {
     options = @{@"AVURLAssetHTTPHeaderFieldsKey" : headers};
   }
   AVURLAsset *urlAsset = [AVURLAsset URLAssetWithURL:url options:options];
   AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:urlAsset];
-  return [self initWithPlayerItem:item frameUpdater:frameUpdater playerFactory:playerFactory];
+  return [self initWithPlayerItem:item frameUpdater:frameUpdater playerFactory:playerFactory initialPosition:initialPosition];
 }
 
 - (instancetype)initWithPlayerItem:(AVPlayerItem *)item
                       frameUpdater:(FLTFrameUpdater *)frameUpdater
-                     playerFactory:(id<FVPPlayerFactory>)playerFactory {
+                     playerFactory:(id<FVPPlayerFactory>)playerFactory
+                   initialPosition:(int64_t)initialPosition {
   self = [super init];
   NSAssert(self, @"super init cannot be nil");
 
@@ -275,6 +280,12 @@ NS_INLINE UIViewController *rootViewController(void) {
   // invisible AVPlayerLayer is used to overwrite the protection of pixel buffers in those streams
   // for issue #1, and restore the correct width and height for issue #2.
   _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
+
+  if (initialPosition > 0) {
+    CMTime seekTime = CMTimeMake(initialPosition, 1000);
+    [_player seekToTime:seekTime toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+  }
+
   [rootViewController().view.layer addSublayer:_playerLayer];
 
   [self createVideoOutputAndDisplayLink:frameUpdater];
@@ -661,13 +672,15 @@ NS_INLINE UIViewController *rootViewController(void) {
     }
     player = [[FLTVideoPlayer alloc] initWithAsset:assetPath
                                       frameUpdater:frameUpdater
-                                     playerFactory:_playerFactory];
+                                     playerFactory:_playerFactory
+                                   initialPosition:input.initialPosition ? [input.initialPosition intValue] : 0];
     return [self onPlayerSetup:player frameUpdater:frameUpdater];
   } else if (input.uri) {
     player = [[FLTVideoPlayer alloc] initWithURL:[NSURL URLWithString:input.uri]
                                     frameUpdater:frameUpdater
                                      httpHeaders:input.httpHeaders
-                                   playerFactory:_playerFactory];
+                                   playerFactory:_playerFactory
+                                 initialPosition:input.initialPosition ? [input.initialPosition intValue] : 0];
     return [self onPlayerSetup:player frameUpdater:frameUpdater];
   } else {
     *error = [FlutterError errorWithCode:@"video_player" message:@"not implemented" details:nil];

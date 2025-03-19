@@ -31,7 +31,10 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
   }
 
   @override
-  Future<int?> create(DataSource dataSource) async {
+  Future<int?> create(
+    DataSource dataSource, {
+    Duration? initialPosition,
+  }) async {
     String? asset;
     String? packageName;
     String? uri;
@@ -60,6 +63,7 @@ class AVFoundationVideoPlayer extends VideoPlayerPlatform {
       uri: uri,
       httpHeaders: httpHeaders,
       formatHint: formatHint,
+      initialPosition: initialPosition?.inMilliseconds,
     );
 
     final TextureMessage response = await _api.create(message);

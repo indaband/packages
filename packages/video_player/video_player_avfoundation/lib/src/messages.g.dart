@@ -143,6 +143,7 @@ class CreateMessage {
     this.packageName,
     this.formatHint,
     required this.httpHeaders,
+    this.initialPosition,
   });
 
   String? asset;
@@ -155,6 +156,8 @@ class CreateMessage {
 
   Map<String?, String?> httpHeaders;
 
+  int? initialPosition;
+
   Object encode() {
     return <Object?>[
       asset,
@@ -162,6 +165,7 @@ class CreateMessage {
       packageName,
       formatHint,
       httpHeaders,
+      initialPosition,
     ];
   }
 
@@ -172,7 +176,9 @@ class CreateMessage {
       uri: result[1] as String?,
       packageName: result[2] as String?,
       formatHint: result[3] as String?,
-      httpHeaders: (result[4] as Map<Object?, Object?>?)!.cast<String?, String?>(),
+      httpHeaders:
+          (result[4] as Map<Object?, Object?>?)!.cast<String?, String?>(),
+      initialPosition: result[5] as int?,
     );
   }
 }

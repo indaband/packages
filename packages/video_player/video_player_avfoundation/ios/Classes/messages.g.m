@@ -213,13 +213,15 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     uri:(nullable NSString *)uri
     packageName:(nullable NSString *)packageName
     formatHint:(nullable NSString *)formatHint
-    httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders {
+    httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders
+    initialPosition:(nullable NSNumber *)initialPosition {
   FLTCreateMessage* pigeonResult = [[FLTCreateMessage alloc] init];
   pigeonResult.asset = asset;
   pigeonResult.uri = uri;
   pigeonResult.packageName = packageName;
   pigeonResult.formatHint = formatHint;
   pigeonResult.httpHeaders = httpHeaders;
+  pigeonResult.initialPosition = initialPosition;
   return pigeonResult;
 }
 + (FLTCreateMessage *)fromList:(NSArray *)list {
@@ -230,6 +232,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   pigeonResult.formatHint = GetNullableObjectAtIndex(list, 3);
   pigeonResult.httpHeaders = GetNullableObjectAtIndex(list, 4);
   NSAssert(pigeonResult.httpHeaders != nil, @"");
+  pigeonResult.initialPosition = GetNullableObjectAtIndex(list, 5);
   return pigeonResult;
 }
 + (nullable FLTCreateMessage *)nullableFromList:(NSArray *)list {
@@ -242,6 +245,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
     (self.packageName ?: [NSNull null]),
     (self.formatHint ?: [NSNull null]),
     (self.httpHeaders ?: [NSNull null]),
+    (self.initialPosition ?: [NSNull null]),
   ];
 }
 @end
