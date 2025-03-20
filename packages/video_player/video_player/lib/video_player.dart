@@ -440,6 +440,11 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           initialPosition: initialPosition,
         )) ??
         kUninitializedTextureId;
+
+    if (initialPosition != null) {
+      _updatePosition(initialPosition);
+    }
+
     _creatingCompleter!.complete(null);
     final Completer<void> initializingCompleter = Completer<void>();
 
