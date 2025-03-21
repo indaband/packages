@@ -274,17 +274,17 @@ NS_INLINE UIViewController *rootViewController(void) {
   _player = [playerFactory playerWithPlayerItem:item];
   _player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
 
-  if (initialPosition > 0) {
-    CMTime seekTime = CMTimeMake(initialPosition, 30);
-    [_player seekToTime:seekTime toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
-  }
-
   // This is to fix 2 bugs: 1. blank video for encrypted video streams on iOS 16
   // (https://github.com/flutter/flutter/issues/111457) and 2. swapped width and height for some
   // video streams (not just iOS 16).  (https://github.com/flutter/flutter/issues/109116). An
   // invisible AVPlayerLayer is used to overwrite the protection of pixel buffers in those streams
   // for issue #1, and restore the correct width and height for issue #2.
   _playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
+
+  if (initialPosition > 0) {
+    CMTime seekTime = CMTimeMake(initialPosition, 1000);
+    [_player seekToTime:seekTime toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+  }
 
   [rootViewController().view.layer addSublayer:_playerLayer];
 
