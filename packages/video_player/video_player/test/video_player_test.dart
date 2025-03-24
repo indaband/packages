@@ -56,7 +56,9 @@ class FakeController extends ValueNotifier<VideoPlayerValue>
   Future<void> setPlaybackSpeed(double speed) async {}
 
   @override
-  Future<void> initialize() async {}
+  Future<void> initialize({
+    Duration? initialPosition,
+  }) async {}
 
   @override
   Future<void> pause() async {}
@@ -83,10 +85,20 @@ class FakeController extends ValueNotifier<VideoPlayerValue>
   Future<void> setClosedCaptionFile(
     Future<ClosedCaptionFile>? closedCaptionFile,
   ) async {}
+
+  @override
+  Future<List<Track>> getAvailableTracks() async {
+    return _availableTracks();
+  }
+
+  @override
+  void selectTrack(Track track) {}
 }
 
 Future<ClosedCaptionFile> _loadClosedCaption() async =>
     _FakeClosedCaptionFile();
+
+List<Track> _availableTracks() => <Track>[];
 
 class _FakeClosedCaptionFile extends ClosedCaptionFile {
   @override
@@ -871,6 +883,37 @@ void main() {
       });
     });
 
+    group('getAvailableTracks', () {
+      test('returns platform tracks', () async {
+        final VideoPlayerController controller =
+            VideoPlayerController.networkUrl(_localhostUri);
+
+        await controller.initialize();
+        final List<Track> tracks = await controller.getAvailableTracks();
+
+        expect(
+          tracks,
+          hasLength(1),
+        );
+        expect(tracks.first.name, 'fakeTrack');
+        expect(tracks.first.selected, true);
+        expect(fakeVideoPlayerPlatform.calls.last, 'getAvailableTracks');
+      });
+    });
+
+    group('selectTrack', () {
+      test('calls platform', () async {
+        final VideoPlayerController controller =
+            VideoPlayerController.networkUrl(_localhostUri);
+
+        await controller.initialize();
+        const Track track = Track('toSelectTrack', true);
+        controller.selectTrack(track);
+
+        expect(fakeVideoPlayerPlatform.calls.last, 'selectTrack');
+      });
+    });
+
     group('Platform callbacks', () {
       testWidgets('playing completed', (WidgetTester tester) async {
         final VideoPlayerController controller =
@@ -1069,7 +1112,8 @@ void main() {
           'isBuffering: true, '
           'volume: 0.5, '
           'playbackSpeed: 1.5, '
-          'errorDescription: null)');
+          'errorDescription: null, '
+          'isCompleted: false),');
     });
 
     group('copyWith()', () {
@@ -1217,7 +1261,10 @@ class FakeVideoPlayerPlatform extends VideoPlayerPlatform {
   final Map<int, Duration> _positions = <int, Duration>{};
 
   @override
-  Future<int?> create(DataSource dataSource) async {
+  Future<int?> create(
+    DataSource dataSource, {
+    Duration? initialPosition,
+  }) async {
     calls.add('create');
     final StreamController<VideoEvent> stream = StreamController<VideoEvent>();
     streams[nextTextureId] = stream;
@@ -1290,6 +1337,19 @@ class FakeVideoPlayerPlatform extends VideoPlayerPlatform {
   @override
   Future<void> setMixWithOthers(bool mixWithOthers) async {
     calls.add('setMixWithOthers');
+  }
+
+  @override
+  Future<List<Track>> getAvailableTracks(int textureId) async {
+    calls.add('getAvailableTracks');
+    return <Track>[
+      const Track('fakeTrack', true),
+    ];
+  }
+
+  @override
+  Future<void> selectTrack(int textureId, String track) async {
+    calls.add('selectTrack');
   }
 
   @override

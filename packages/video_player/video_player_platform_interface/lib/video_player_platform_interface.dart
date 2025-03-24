@@ -116,7 +116,7 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
 
 class _PlaceholderImplementation extends VideoPlayerPlatform {}
 
-/// Pepresents a media track
+/// Represents a media track
 class Track {
   /// Creates a new track
   const Track(this.name, [this.selected = false]);
