@@ -456,6 +456,16 @@ public class Messages {
       this.httpHeaders = setterArg;
     }
 
+    private @Nullable Long initialPosition;
+
+    public @Nullable Long getInitialPosition() {
+      return initialPosition;
+    }
+
+    public void setInitialPosition(@Nullable Long setterArg) {
+      this.initialPosition = setterArg;
+    }
+
     /** Constructor is non-public to enforce null safety; use Builder. */
     CreateMessage() {}
 
@@ -496,6 +506,13 @@ public class Messages {
         return this;
       }
 
+      private @Nullable Long initialPosition;
+
+      public @NonNull Builder setInitialPosition(@Nullable Long setterArg) {
+        this.initialPosition = setterArg;
+        return this;
+      }
+
       public @NonNull CreateMessage build() {
         CreateMessage pigeonReturn = new CreateMessage();
         pigeonReturn.setAsset(asset);
@@ -503,18 +520,20 @@ public class Messages {
         pigeonReturn.setPackageName(packageName);
         pigeonReturn.setFormatHint(formatHint);
         pigeonReturn.setHttpHeaders(httpHeaders);
+        pigeonReturn.setInitialPosition(initialPosition);
         return pigeonReturn;
       }
     }
 
     @NonNull
     ArrayList<Object> toList() {
-      ArrayList<Object> toListResult = new ArrayList<Object>(5);
+      ArrayList<Object> toListResult = new ArrayList<Object>(6);
       toListResult.add(asset);
       toListResult.add(uri);
       toListResult.add(packageName);
       toListResult.add(formatHint);
       toListResult.add(httpHeaders);
+      toListResult.add(initialPosition);
       return toListResult;
     }
 
@@ -530,6 +549,8 @@ public class Messages {
       pigeonResult.setFormatHint((String) formatHint);
       Object httpHeaders = list.get(4);
       pigeonResult.setHttpHeaders((Map<String, String>) httpHeaders);
+      Object initialPosition = list.get(5);
+      pigeonResult.setInitialPosition((initialPosition == null) ? null : ((initialPosition instanceof Integer) ? (Integer) initialPosition : (Long) initialPosition));
       return pigeonResult;
     }
   }

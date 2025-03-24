@@ -49,7 +49,7 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
   }
 
   /// Creates an instance of a video player and returns its textureId.
-  Future<int?> create(DataSource dataSource) {
+  Future<int?> create(DataSource dataSource, {Duration? initialPosition}) {
     throw UnimplementedError('create() has not been implemented.');
   }
 
@@ -116,7 +116,7 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
 
 class _PlaceholderImplementation extends VideoPlayerPlatform {}
 
-/// Pepresents a media track
+/// Represents a media track
 class Track {
   /// Creates a new track
   const Track(this.name, [this.selected = false]);

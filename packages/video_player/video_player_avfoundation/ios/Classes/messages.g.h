@@ -73,12 +73,14 @@ NS_ASSUME_NONNULL_BEGIN
     uri:(nullable NSString *)uri
     packageName:(nullable NSString *)packageName
     formatHint:(nullable NSString *)formatHint
-    httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders;
+    httpHeaders:(NSDictionary<NSString *, NSString *> *)httpHeaders
+    initialPosition:(nullable NSNumber *)initialPosition;
 @property(nonatomic, copy, nullable) NSString * asset;
 @property(nonatomic, copy, nullable) NSString * uri;
 @property(nonatomic, copy, nullable) NSString * packageName;
 @property(nonatomic, copy, nullable) NSString * formatHint;
 @property(nonatomic, strong) NSDictionary<NSString *, NSString *> * httpHeaders;
+@property(nonatomic, strong, nullable) NSNumber * initialPosition;
 @end
 
 @interface FLTMixWithOthersMessage : NSObject

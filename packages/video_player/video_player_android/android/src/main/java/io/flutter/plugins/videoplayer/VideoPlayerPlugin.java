@@ -158,6 +158,9 @@ public class VideoPlayerPlugin implements FlutterPlugin, AndroidVideoPlayerApi {
               httpHeaders,
               options);
     }
+    if (arg.getInitialPosition() != null) {
+      player.seekTo(arg.getInitialPosition().intValue());
+    }
     videoPlayers.put(handle.id(), player);
 
     return new TextureMessage.Builder().setTextureId(handle.id()).build();

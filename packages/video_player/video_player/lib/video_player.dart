@@ -389,7 +389,7 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
   int get textureId => _textureId;
 
   /// Attempts to open the given [dataSource] and load metadata about the video.
-  Future<void> initialize() async {
+  Future<void> initialize({Duration? initialPosition}) async {
     final bool allowBackgroundPlayback =
         videoPlayerOptions?.allowBackgroundPlayback ?? false;
     if (!allowBackgroundPlayback) {
@@ -435,8 +435,16 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
           .setMixWithOthers(videoPlayerOptions!.mixWithOthers);
     }
 
-    _textureId = (await _videoPlayerPlatform.create(dataSourceDescription)) ??
+    _textureId = (await _videoPlayerPlatform.create(
+          dataSourceDescription,
+          initialPosition: initialPosition,
+        )) ??
         kUninitializedTextureId;
+
+    if (initialPosition != null) {
+      _updatePosition(initialPosition);
+    }
+
     _creatingCompleter!.complete(null);
     final Completer<void> initializingCompleter = Completer<void>();
 
